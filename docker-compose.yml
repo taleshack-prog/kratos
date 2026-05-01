@@ -1,0 +1,99 @@
+services:
+
+  db_kratos:
+    image: postgis/postgis:14-3.2
+    container_name: kratos_db_core
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       kratos_core
+      POSTGRES_USER:     kratos_admin
+      POSTGRES_PASSWORD: kratos_secret
+    ports:
+      - "5434:5432"
+    volumes:
+      - kratos_db_data:/var/lib/postgresql/data
+      - ./database/01_kratos_core.sql:/docker-entrypoint-initdb.d/01_kratos_core.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kratos_admin -d kratos_core"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db_pmpa:
+    image: postgis/postgis:14-3.2
+    container_name: kratos_db_pmpa
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       pmpa_govtech
+      POSTGRES_USER:     pmpa_admin
+      POSTGRES_PASSWORD: pmpa_secret
+    ports:
+      - "5433:5432"
+    volumes:
+      - pmpa_db_data:/var/lib/postgresql/data
+      - ./database/02_pmpa_govtech.sql:/docker-entrypoint-initdb.d/02_pmpa_govtech.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pmpa_admin -d pmpa_govtech"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend_kratos:
+    build:
+      context: ./backend-kratos
+      dockerfile: Dockerfile
+    container_name: kratos_backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://kratos_admin:kratos_secret@db_kratos:5432/kratos_core
+    depends_on:
+      db_kratos:
+        condition: service_healthy
+
+  backend_pmpa:
+    build:
+      context: ./backend-pmpa
+      dockerfile: Dockerfile
+    container_name: kratos_pmpa
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://pmpa_admin:pmpa_secret@db_pmpa:5432/pmpa_govtech
+      KRATOS_API_URL: http://backend_kratos:3001
+      KRATOS_INTERNAL_SECRET: change_me_in_production
+    depends_on:
+      db_pmpa:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    container_name: kratos_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  kratos_db_data:
+  pmpa_db_data:
+  redis_data:
+
+networks:
+  default:
+    name: kratos_network
