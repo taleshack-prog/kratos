@@ -1,43 +1,58 @@
+version: '3.8'
+
+# ============================================================
+# KRATOS BASQUETE URBANO — Infraestrutura Local
+# ============================================================
+# Uso:
+#   cp .env.example .env          # configure as variáveis
+#   docker compose up -d          # sobe tudo em background
+#   docker compose logs -f        # acompanha os logs
+#   docker compose down -v        # derruba e limpa volumes
+# ============================================================
+
 services:
 
+  # ── Banco de Dados: kratos_core ─────────────────────────
   db_kratos:
     image: postgis/postgis:14-3.2
     container_name: kratos_db_core
     restart: unless-stopped
     environment:
       POSTGRES_DB:       kratos_core
-      POSTGRES_USER:     kratos_admin
-      POSTGRES_PASSWORD: kratos_secret
+      POSTGRES_USER:     ${DB_KRATOS_USER:-kratos_admin}
+      POSTGRES_PASSWORD: ${DB_KRATOS_PASS:-kratos_secret}
     ports:
-      - "5434:5432"
+      - "5432:5432"
     volumes:
       - kratos_db_data:/var/lib/postgresql/data
       - ./database/01_kratos_core.sql:/docker-entrypoint-initdb.d/01_kratos_core.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U kratos_admin -d kratos_core"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_KRATOS_USER:-kratos_admin} -d kratos_core"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # ── Banco de Dados: pmpa_govtech ────────────────────────
   db_pmpa:
     image: postgis/postgis:14-3.2
     container_name: kratos_db_pmpa
     restart: unless-stopped
     environment:
       POSTGRES_DB:       pmpa_govtech
-      POSTGRES_USER:     pmpa_admin
-      POSTGRES_PASSWORD: pmpa_secret
+      POSTGRES_USER:     ${DB_PMPA_USER:-pmpa_admin}
+      POSTGRES_PASSWORD: ${DB_PMPA_PASS:-pmpa_secret}
     ports:
       - "5433:5432"
     volumes:
       - pmpa_db_data:/var/lib/postgresql/data
       - ./database/02_pmpa_govtech.sql:/docker-entrypoint-initdb.d/02_pmpa_govtech.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pmpa_admin -d pmpa_govtech"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_PMPA_USER:-pmpa_admin} -d pmpa_govtech"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # ── Backend Kratos (NestJS) ─────────────────────────────
   backend_kratos:
     build:
       context: ./backend-kratos
@@ -48,13 +63,17 @@ services:
       - "3001:3001"
     env_file: .env
     environment:
-      NODE_ENV: development
-      PORT: 3001
-      DATABASE_URL: postgresql://kratos_admin:kratos_secret@db_kratos:5432/kratos_core
+      NODE_ENV:    ${NODE_ENV:-development}
+      PORT:        3001
+      DATABASE_URL: postgresql://${DB_KRATOS_USER:-kratos_admin}:${DB_KRATOS_PASS:-kratos_secret}@db_kratos:5432/kratos_core
     depends_on:
       db_kratos:
         condition: service_healthy
+    volumes:
+      - ./backend-kratos:/app
+      - /app/node_modules       # preserva node_modules do container
 
+  # ── Backend PMPA (Node.js/Express) ──────────────────────
   backend_pmpa:
     build:
       context: ./backend-pmpa
@@ -65,15 +84,21 @@ services:
       - "3000:3000"
     env_file: .env
     environment:
-      NODE_ENV: development
-      PORT: 3000
-      DATABASE_URL: postgresql://pmpa_admin:pmpa_secret@db_pmpa:5432/pmpa_govtech
-      KRATOS_API_URL: http://backend_kratos:3001
-      KRATOS_INTERNAL_SECRET: change_me_in_production
+      NODE_ENV:    ${NODE_ENV:-development}
+      PORT:        3000
+      DATABASE_URL: postgresql://${DB_PMPA_USER:-pmpa_admin}:${DB_PMPA_PASS:-pmpa_secret}@db_pmpa:5432/pmpa_govtech
+      KRATOS_API_URL:    http://backend_kratos:3001
+      KRATOS_API_SECRET: ${KRATOS_INTERNAL_SECRET:-change_me_in_production}
     depends_on:
       db_pmpa:
         condition: service_healthy
+      backend_kratos:
+        condition: service_started
+    volumes:
+      - ./backend-pmpa:/app
+      - /app/node_modules
 
+  # ── Redis (Cache e Filas) ────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: kratos_redis
