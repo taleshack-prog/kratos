@@ -160,4 +160,42 @@ export class MatchSchedulingService {
       [lat, lng, radiusKm],
     );
   }
+
+  async joinMatch(matchId: string, athleteId: string, teamColor: string) {
+    const match = await this.matchRepo.findOneBy({ id: matchId });
+    if(!match) throw new Error('Partida nao encontrada');
+    await this.dataSource.query(
+      "INSERT INTO match_roster (match_id, athlete_id, team_color) VALUES ($1,$2,$3) ON CONFLICT (match_id, athlete_id) DO NOTHING",
+      [matchId, athleteId, teamColor]);
+    return { message: 'Voce entrou na partida.' };
+  }
+
+  async findUpcoming(courtId?: string, limit=20) {
+    const params: any[] = [limit];
+    const filter = courtId ? "AND ms.court_id = $2" : "";
+    if(courtId) params.push(courtId);
+    return this.dataSource.query(
+      "SELECT ms.id, ms.modality, ms.match_type, ms.status, ms.scheduled_start, ms.scheduled_end, c.name AS court_name, COUNT(mr.athlete_id) AS player_count FROM match_scheduling ms JOIN courts c ON c.id=ms.court_id LEFT JOIN match_roster mr ON mr.match_id=ms.id WHERE ms.status IN ('scheduled','checkin') AND ms.scheduled_start >= NOW() " + filter + " GROUP BY ms.id, c.name ORDER BY ms.scheduled_start ASC LIMIT $1",
+      params);
+  }
+
+  async findMatchDetails(matchId: string) {
+    const r = await this.dataSource.query(
+      "SELECT ms.*, c.name AS court_name, c.address FROM match_scheduling ms JOIN courts c ON c.id=ms.court_id WHERE ms.id=$1",
+      [matchId]);
+    if(!r.length) throw new Error('Partida nao encontrada');
+    const roster = await this.dataSource.query(
+      "SELECT mr.team_color, a.id, a.name FROM match_roster mr JOIN athletes a ON a.id=mr.athlete_id WHERE mr.match_id=$1",
+      [matchId]);
+    return { ...r[0], roster };
+  }
+
+  async cancelMatch(matchId: string, athleteId: string) {
+    const match = await this.matchRepo.findOneBy({ id: matchId });
+    if(!match) throw new Error('Partida nao encontrada');
+    if(match.creatorId !== athleteId) throw new Error('Somente o criador pode cancelar');
+    await this.matchRepo.update(matchId, { status: 'cancelled' });
+    return { message: 'Partida cancelada.' };
+  }
+
 }
