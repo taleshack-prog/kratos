@@ -1,3 +1,4 @@
+import ZeladoriaScreen from "./src/screens/athlete/ZeladoriaScreen";
 import CheckInScreen from "./src/screens/athlete/CheckInP2PScreen";
 // App.tsx — Kratos Basquete Urbano
 // Navegação completa: 4 telas Atleta + 3 telas Pais/Responsáveis
@@ -376,88 +377,8 @@ function AuthScreen() {
 // ────────────────────────────────────────────────────────────
 // TELA 7: ZELADORIA
 // ────────────────────────────────────────────────────────────
-function ZeladoriaScreen() {
-  const reports = [
-    { icon:'🏀', title:'Aro quebrado',  where:'Praça da Encol', when:'2h',     status:'reported',    pct:10, color: C.red    },
-    { icon:'💡', title:'Poste sem luz', where:'Parcão',          when:'3 dias', status:'in_progress', pct:55, color: C.orange },
-    { icon:'🧹', title:'Limpeza geral', where:'Praça Germânia',  when:'18h',   status:'resolved',    pct:100,color: C.green  },
-  ];
-  const statusLabel = (s: string) =>
-    s === 'reported' ? 'Pendente' : s === 'in_progress' ? 'Em andamento' : 'Resolvido';
-  const statusColor = (s: string) =>
-    s === 'reported' ? C.red : s === 'in_progress' ? C.orange : C.green;
-
-  return (
-    <SafeAreaView style={s.screen}>
-      <View style={s.header}>
-        <Text style={s.headerTitle}>Zeladoria</Text>
-        <Text style={s.headerSub}>Reportar e acompanhar problemas</Text>
-      </View>
-      <ScrollView contentContainerStyle={{ padding:16, gap:10 }}>
-
-        {/* Botão de report */}
-        <TouchableOpacity style={[s.card, { borderStyle:'dashed', borderColor: C.orange }]}>
-          <View style={s.playerRow}>
-            <View style={[s.playerAv, { backgroundColor: C.orange+'22', width:48, height:48, borderRadius:16 }]}>
-              <Text style={{ fontSize:20 }}>📸</Text>
-            </View>
-            <View style={{ flex:1 }}>
-              <Text style={s.courtName}>Fotografar problema</Text>
-              <Text style={s.courtMeta}>GPS e metadata capturados automaticamente</Text>
-            </View>
-          </View>
-
-          <View style={s.issueGrid}>
-            {['🏀 Aro','💡 Iluminação','🚧 Piso','🧹 Limpeza'].map(item => (
-              <View key={item} style={s.issueChip}>
-                <Text style={s.issueChipText}>{item}</Text>
-              </View>
-            ))}
-          </View>
-          <Text style={[s.courtMeta, { color: C.orange, textAlign:'center', marginTop:8 }]}>
-            +5 pontos Elo Z por report válido
-          </Text>
-        </TouchableOpacity>
-
-        {/* Reports */}
-        <SectionTitle>REPORTS ATIVOS EM POA</SectionTitle>
-        {reports.map((r, i) => (
-          <Card key={i} style={r.status === 'resolved' ? { borderColor: C.green+'44' } : {}}>
-            <View style={s.playerRow}>
-              <View style={[s.playerAv, { backgroundColor: r.color+'22', width:40, height:40, borderRadius:12 }]}>
-                <Text style={{ fontSize:18 }}>{r.icon}</Text>
-              </View>
-              <View style={{ flex:1 }}>
-                <View style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
-                  <Text style={s.courtName}>{r.title}</Text>
-                  <Badge label={statusLabel(r.status)} color={statusColor(r.status)} />
-                </View>
-                <Text style={s.courtMeta}>{r.where} · Reportado há {r.when}</Text>
-                <View style={[s.eloTrack, { marginTop:8 }]}>
-                  <View style={[s.eloFill, { width:`${r.pct}%`, backgroundColor: r.color }]} />
-                </View>
-              </View>
-            </View>
-            {r.status === 'resolved' && (
-              <View style={s.resolvedFooter}>
-                <Text style={{ fontSize:11, color: C.green }}>+5 Elo Z creditado</Text>
-                <Text style={{ fontSize:11, color: C.text3 }}>IZ: 18h (meta &lt;72h)</Text>
-              </View>
-            )}
-          </Card>
-        ))}
-        <View style={{ height:40 }} />
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-// ────────────────────────────────────────────────────────────
-// NAVEGAÇÃO PRINCIPAL
-// ────────────────────────────────────────────────────────────
 const AthleteTab = createBottomTabNavigator();
 const ParentTab  = createBottomTabNavigator();
-
 function AthleteNavigator() {
   return (
     <AthleteTab.Navigator
