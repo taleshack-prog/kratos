@@ -1,3 +1,4 @@
+import CheckInScreen from "./src/screens/athlete/CheckInP2PScreen";
 // App.tsx — Kratos Basquete Urbano
 // Navegação completa: 4 telas Atleta + 3 telas Pais/Responsáveis
 import React, { useState } from 'react';
@@ -213,111 +214,6 @@ function EloScreen() {
 
 // ────────────────────────────────────────────────────────────
 // TELA 4: CHECK-IN P2P
-// ────────────────────────────────────────────────────────────
-function CheckInScreen() {
-  const [validated, setValidated] = useState(1);
-  const minQuorum = 6;
-
-  const players = [
-    { initials:'GS', name:'Gustavo Silva', rssi:-62, dist:3,  color:'#FF6B1A', ok:true  },
-    { initials:'RM', name:'Rafael Melo',   rssi:-71, dist:7,  color:'#4A9EFF', ok:false },
-    { initials:'LF', name:'Lucas Farias',  rssi:-78, dist:12, color:'#9B59B6', ok:false },
-  ];
-
-  const rssiColor = (r: number) => r >= -65 ? C.green : r >= -75 ? C.orange : C.red;
-  const rssiBars  = (r: number) => r >= -60 ? 4 : r >= -70 ? 3 : r >= -80 ? 2 : 1;
-
-  return (
-    <SafeAreaView style={s.screen}>
-      <ScrollView contentContainerStyle={{ alignItems:'center', padding:16 }}>
-
-        <View style={s.bleBadge}>
-          <View style={s.bleDot} />
-          <Text style={s.bleText}>Bluetooth LE · Ativo</Text>
-        </View>
-
-        <Text style={s.checkInTitle}>Validar{'\n'}Presença</Text>
-        <Text style={s.checkInSub}>Raio de validação: 10 metros</Text>
-
-        {/* Ícone de pulso estático */}
-        <View style={s.pulseStatic}>
-          <View style={s.pulseRingA} />
-          <View style={s.pulseRingB} />
-          <View style={s.pulseCenter}>
-            <Text style={{ fontSize:28 }}>📡</Text>
-          </View>
-        </View>
-
-        {/* Barra de quórum */}
-        <View style={s.quorumBox}>
-          <View style={s.quorumTrack}>
-            <View style={[s.quorumFill, {
-              width: `${Math.min(validated/minQuorum,1)*100}%`,
-              backgroundColor: validated >= minQuorum ? C.green : C.orange,
-            }]} />
-          </View>
-          <Text style={s.quorumText}>
-            <Text style={[s.quorumNum, { color: validated >= minQuorum ? C.green : C.orange }]}>
-              {validated}
-            </Text>
-            <Text style={s.quorumSub}>/{minQuorum} validados · Quórum: {minQuorum}</Text>
-          </Text>
-        </View>
-
-        {/* Jogadores */}
-        <Text style={[s.sectionTitle, { alignSelf:'flex-start', width:'100%' }]}>
-          JOGADORES DETECTADOS
-        </Text>
-        <View style={{ width:'100%', gap:8, marginTop:8 }}>
-          {players.map((p,i) => (
-            <Card key={i} style={p.ok ? { borderColor: C.green + '44' } : {}}>
-              <View style={s.playerRow}>
-                <View style={[s.playerAv, { backgroundColor: p.color }]}>
-                  <Text style={s.playerAvText}>{p.initials}</Text>
-                </View>
-                <View style={{ flex:1 }}>
-                  <Text style={s.playerName}>{p.name}</Text>
-                  <View style={{ flexDirection:'row', alignItems:'center', gap:6, marginTop:3 }}>
-                    <View style={s.rssiBars}>
-                      {[1,2,3,4].map(b => (
-                        <View key={b} style={[
-                          s.rssiBar, { height: 3 + b*3 },
-                          b <= rssiBars(p.rssi)
-                            ? { backgroundColor: rssiColor(p.rssi) }
-                            : { backgroundColor: C.bg4 }
-                        ]} />
-                      ))}
-                    </View>
-                    <Text style={s.rssiText}>{p.dist}m · {p.rssi}dBm</Text>
-                  </View>
-                </View>
-                <View style={[s.validateBtn,
-                  p.ok ? { backgroundColor: C.green+'33', borderColor: C.green+'66' }
-                       : { backgroundColor: C.bg4, borderColor: C.border }
-                ]}>
-                  <Text style={{ color: p.ok ? C.green : C.text2 }}>{p.ok ? '✓' : '○'}</Text>
-                </View>
-              </View>
-            </Card>
-          ))}
-        </View>
-
-        <TouchableOpacity
-          style={[s.checkInBtn, validated >= minQuorum && { backgroundColor: C.green }]}
-          onPress={() => setValidated(v => Math.min(v+1, minQuorum))}
-        >
-          <Text style={s.checkInBtnText}>
-            {validated >= minQuorum ? 'JOGO CONFIRMADO!' : 'FAZER CHECK-IN'}
-          </Text>
-        </TouchableOpacity>
-        <View style={{ height:40 }} />
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-// ────────────────────────────────────────────────────────────
-// TELA 5: DASHBOARD DOS PAIS
 // ────────────────────────────────────────────────────────────
 function ParentDashScreen() {
   const stats = [
