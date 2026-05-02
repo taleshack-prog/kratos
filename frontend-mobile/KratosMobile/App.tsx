@@ -46,9 +46,11 @@ function ScheduleScreen() {
   const hasMatch = [5,6,8,11];
 
   const slots = [
-    { time:'19:00', type:'Quadra Inteira · 5v5', status:'free',  players:0,  elo:1400 },
-    { time:'20:00', type:'Meia Quadra · 3v3',    status:'busy',  players:5,  elo:0    },
-    { time:'21:00', type:'Quadra Inteira · 3v3', status:'free',  players:0,  elo:0    },
+    { time:'19:00', type:'Quadra Inteira · 5v5', status:'free', players:0,  elo:1400 },
+    { time:'19:30', type:'Meia Quadra · 3v3',    status:'busy', players:5,  elo:0    },
+    { time:'20:00', type:'Meia Quadra · 2v2',    status:'free', players:0,  elo:0    },
+    { time:'20:30', type:'Meia Quadra · 1v1',    status:'free', players:0,  elo:0    },
+    { time:'21:00', type:'Quadra Inteira · 5v5', status:'free', players:0,  elo:1200 },
   ];
 
   return (
