@@ -6,6 +6,7 @@ import {
   ScrollView, SafeAreaView, StatusBar, Dimensions,
 } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import MapScreen from './src/screens/athlete/MapScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const { width } = Dimensions.get('window');
@@ -37,81 +38,6 @@ const Card = ({ children, style }: any) => (
 
 // ────────────────────────────────────────────────────────────
 // TELA 1: MAPA (placeholder — MapScreen.tsx integra react-native-maps)
-// ────────────────────────────────────────────────────────────
-function MapScreen() {
-  const courts = [
-    { id:'1', name:'Praça da Encol',   district:'Bela Vista',    status:'busy',   dist:'0.8', match:'3v3 rolando', players:6 },
-    { id:'2', name:'Parcão',           district:'Moinhos',       status:'active', dist:'1.4', match:null,          players:0 },
-    { id:'3', name:'Marinha do Brasil',district:'Praia de Belas',status:'maint',  dist:'2.1', match:null,          players:0 },
-    { id:'4', name:'Praça Germânia',   district:"Passo d'Areia", status:'busy',   dist:'3.2', match:'1v1',         players:2 },
-    { id:'5', name:'Parque Redenção',  district:'Farroupilha',   status:'busy',   dist:'1.9', match:'5v5',         players:10},
-  ];
-
-  const statusColor = (s: string) =>
-    s === 'active' ? C.green : s === 'busy' ? C.orange : C.text3;
-
-  const statusLabel = (c: any) =>
-    c.status === 'maint' ? 'Manutenção' : c.match ? c.match : 'Disponível';
-
-  return (
-    <SafeAreaView style={s.screen}>
-      <StatusBar barStyle="light-content" backgroundColor={C.bg} />
-
-      {/* Header */}
-      <View style={s.header}>
-        <Text style={s.headerTitle}>Quadras Próximas</Text>
-        <Text style={s.headerSub}>Porto Alegre · 5km</Text>
-      </View>
-
-      {/* Mapa placeholder */}
-      <View style={s.mapPlaceholder}>
-        <View style={[s.heatBlob, { left:'30%', top:'30%', backgroundColor: C.orange }]} />
-        <View style={[s.heatBlob, { left:'60%', top:'50%', backgroundColor: C.green,  width:60, height:60 }]} />
-        <View style={[s.heatBlob, { left:'15%', top:'55%', backgroundColor: C.orange, width:50, height:50 }]} />
-        {courts.map(c => (
-          <View key={c.id} style={[s.pin, {
-            left: `${15 + parseInt(c.id) * 14}%`,
-            top:  `${20 + parseInt(c.id) * 12}%`,
-            borderColor: statusColor(c.status),
-          }]}>
-            <View style={[s.pinDot, { backgroundColor: statusColor(c.status) }]} />
-          </View>
-        ))}
-        <View style={s.radiusBadge}>
-          <Text style={s.radiusText}>Raio </Text>
-          <Text style={[s.radiusText, { color: C.orange, fontWeight:'700' }]}>5km</Text>
-        </View>
-      </View>
-
-      {/* Lista */}
-      <ScrollView style={{ flex:1 }} contentContainerStyle={{ padding:16, gap:8 }}>
-        {courts.map(c => (
-          <Card key={c.id}>
-            <View style={s.courtRow}>
-              <View style={[s.courtDot, { backgroundColor: statusColor(c.status) }]} />
-              <View style={{ flex:1 }}>
-                <Text style={s.courtName}>{c.name}</Text>
-                <Text style={s.courtMeta}>{c.district}</Text>
-              </View>
-              <View style={{ alignItems:'flex-end', gap:4 }}>
-                <Text style={[s.courtDist, { color: statusColor(c.status) }]}>{c.dist}km</Text>
-                <Badge label={statusLabel(c)} color={statusColor(c.status)} />
-              </View>
-            </View>
-          </Card>
-        ))}
-      </ScrollView>
-
-      {/* FAB */}
-      <TouchableOpacity style={s.fab}>
-        <Text style={s.fabText}>+</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
-  );
-}
-
-// ────────────────────────────────────────────────────────────
-// TELA 2: AGENDAMENTO
 // ────────────────────────────────────────────────────────────
 function ScheduleScreen() {
   const [selectedDay, setSelectedDay] = useState(1);
