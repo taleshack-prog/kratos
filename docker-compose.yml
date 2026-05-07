@@ -22,7 +22,7 @@ services:
       POSTGRES_USER:     ${DB_KRATOS_USER:-kratos_admin}
       POSTGRES_PASSWORD: ${DB_KRATOS_PASS:-kratos_secret}
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - kratos_db_data:/var/lib/postgresql/data
       - ./database/01_kratos_core.sql:/docker-entrypoint-initdb.d/01_kratos_core.sql:ro
