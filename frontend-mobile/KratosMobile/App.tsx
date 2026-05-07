@@ -2,7 +2,9 @@ import ZeladoriaScreen from "./src/screens/athlete/ZeladoriaScreen";
 import CheckInScreen from "./src/screens/athlete/CheckInP2PScreen";
 // App.tsx — Kratos Basquete Urbano
 // Navegação completa: 4 telas Atleta + 3 telas Pais/Responsáveis
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { QueryProvider } from './src/providers/QueryProvider';
+import { useAuthStore } from './src/store/authStore';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, SafeAreaView, StatusBar, Dimensions,
@@ -451,10 +453,12 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <StatusBar barStyle="light-content" backgroundColor={C.bg} />
-      {profile === 'athlete' ? <AthleteNavigator /> : <ParentNavigator />}
-    </NavigationContainer>
+    <QueryProvider>
+      <NavigationContainer>
+        <StatusBar barStyle="light-content" backgroundColor={C.bg} />
+        {profile === 'athlete' ? <AthleteNavigator /> : <ParentNavigator />}
+      </NavigationContainer>
+    </QueryProvider>
   );
 }
 
