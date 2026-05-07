@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { QueryProvider } from './src/providers/QueryProvider';
 import { useAuthStore } from './src/store/authStore';
 import LoginScreen from './src/screens/auth/LoginScreen';
+import EloScreen from './src/screens/athlete/EloScreen';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, SafeAreaView, StatusBar, Dimensions,
@@ -132,84 +133,6 @@ function ScheduleScreen() {
               </View>
             </Card>
           ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-// ────────────────────────────────────────────────────────────
-// TELA 3: PERFIL ELO
-// ────────────────────────────────────────────────────────────
-function EloScreen() {
-  const dims = [
-    { key:'H', label:'Habilidade',   value:1820, color: C.orange, pct:0.73 },
-    { key:'C', label:'Comportamento',value:1710, color: C.blue,   pct:0.68 },
-    { key:'Z', label:'Zeladoria',    value:1580, color: C.green,  pct:0.63 },
-  ];
-  const history = [45,55,70,60,75,85,90,95];
-  const medals = ['Guardião Encol','12 vitórias','Fair Play S1'];
-
-  return (
-    <SafeAreaView style={s.screen}>
-      <ScrollView contentContainerStyle={{ padding:16 }}>
-        {/* Hero */}
-        <View style={s.eloHero}>
-          <View style={s.eloAvatar}><Text style={s.eloAvatarText}>TH</Text></View>
-          <View style={{ flex:1 }}>
-            <Text style={s.eloName}>Tales Hack</Text>
-            <Text style={s.eloPos}>Point Guard · Porto Alegre</Text>
-            <Text style={s.eloComposite}>1742</Text>
-            <Text style={s.eloCompositeLabel}>ELO COMPOSTO</Text>
-          </View>
-        </View>
-
-        {/* Badges */}
-        <View style={s.badgeRow}>
-          <Badge label="Capitão · Encol" color={C.orange} />
-          <Badge label="47 jogos" color={C.green} />
-        </View>
-
-        {/* Barras Elo */}
-        <SectionTitle>DIMENSÕES DO ELO</SectionTitle>
-        <View style={{ gap:12, marginTop:12 }}>
-          {dims.map(d => (
-            <View key={d.key}>
-              <View style={s.eloDimHeader}>
-                <Text style={s.eloDimLabel}>{d.key} — {d.label}</Text>
-                <Text style={[s.eloDimValue, { color: d.color }]}>{d.value}</Text>
-              </View>
-              <View style={s.eloTrack}>
-                <View style={[s.eloFill, { width: `${d.pct * 100}%`, backgroundColor: d.color }]} />
-              </View>
-            </View>
-          ))}
-        </View>
-
-        {/* Medalhas */}
-        <SectionTitle>CONQUISTAS</SectionTitle>
-        <View style={s.badgeRow}>
-          {medals.map(m => (
-            <View key={m} style={s.medal}>
-              <Text style={s.medalText}>{m}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Histórico */}
-        <SectionTitle>ÚLTIMAS 8 PARTIDAS</SectionTitle>
-        <View style={s.histChart}>
-          {history.map((h, i) => (
-            <View key={i} style={[
-              s.histBar,
-              { height: h * 0.8,
-                backgroundColor: h >= 80 ? C.green : h >= 60 ? C.orange : C.red }
-            ]} />
-          ))}
-        </View>
-        <View style={s.histLabels}>
-          <Text style={s.histLabel}>Mais antigo</Text>
-          <Text style={s.histLabel}>Hoje</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
