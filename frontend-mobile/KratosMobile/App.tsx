@@ -5,6 +5,7 @@ import CheckInScreen from "./src/screens/athlete/CheckInP2PScreen";
 import React, { useState, useEffect } from 'react';
 import { QueryProvider } from './src/providers/QueryProvider';
 import { useAuthStore } from './src/store/authStore';
+import LoginScreen from './src/screens/auth/LoginScreen';
 import {
   View, Text, StyleSheet, TouchableOpacity,
   ScrollView, SafeAreaView, StatusBar, Dimensions,
@@ -424,6 +425,11 @@ function ParentNavigator() {
 // ────────────────────────────────────────────────────────────
 export default function App() {
   const [profile, setProfile] = useState<'athlete'|'parent'|null>(null);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  if (!loggedIn) {
+    return <LoginScreen onLogin={() => setLoggedIn(true)} />;
+  }
 
   if (!profile) {
     return (
