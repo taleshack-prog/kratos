@@ -1,6 +1,6 @@
 import ZeladoriaScreen from "./src/screens/athlete/ZeladoriaScreen";
 import CheckInScreen from "./src/screens/athlete/CheckInP2PScreen";
-// App.tsx — Kratos Basquete Urbano
+// App.tsx — Asphalt Hoops
 // Navegação completa: 4 telas Atleta + 3 telas Pais/Responsáveis
 import React, { useState, useEffect } from 'react';
 import { QueryProvider } from './src/providers/QueryProvider';
@@ -430,7 +430,7 @@ export default function App() {
       <SafeAreaView style={[s.screen, { justifyContent:'center', alignItems:'center', gap:20 }]}>
         <StatusBar barStyle="light-content" backgroundColor={C.bg} />
         <Text style={[s.headerTitle, { fontSize:36, textAlign:'center' }]}>
-          KRATOS{'\n'}BASQUETE
+          ASPHALT{'\n'}HOOPS
         </Text>
         <Text style={[s.headerSub, { textAlign:'center', marginBottom:20 }]}>
           Quem é você hoje?
